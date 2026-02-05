@@ -60,6 +60,20 @@ class _MyHomePageState extends State<MyHomePage> {
   String _result = ''; // latest result for display
 
   bool _justEvaluated = false; // if last press was '=', next digit starts fresh
+String _squareValue(String value) {
+  final double? x = double.tryParse(value);
+  if (x == null) return 'Error';
+
+  final double squared = x * x;
+
+  if (squared == squared.roundToDouble()) {
+    return squared.toInt().toString();
+  }
+
+  return squared
+      .toStringAsFixed(6)
+      .replaceFirst(RegExp(r'\.?0+$'), '');
+}
 
   bool _isOperator(String s) {
     return s == '+' || s == '-' || s == '*' || s == '/';
@@ -127,6 +141,18 @@ class _MyHomePageState extends State<MyHomePage> {
         _clearAll();
         return;
       }
+      if (token == 'x²') {
+  final String base = _result.isNotEmpty ? _result : _expression;
+
+  final String squared = _squareValue(base);
+
+  _accumulator = '$base² = $squared';
+  _expression = squared;
+  _result = squared;
+  _justEvaluated = true;
+  return;
+}
+
 
       if (token == '=') {
         final String r = _evalExpression(_expression);
@@ -267,6 +293,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   Row(
                     children: [
                       _calcButton('C', background: Colors.red, foreground: Colors.white),
+                      _calcButton('x²', background: Colors.blueGrey, foreground: Colors.white),                      
                       _calcButton('/', background: Colors.blueGrey, foreground: Colors.white),
                       _calcButton('*', background: Colors.blueGrey, foreground: Colors.white),
                       _calcButton('-', background: Colors.blueGrey, foreground: Colors.white),
